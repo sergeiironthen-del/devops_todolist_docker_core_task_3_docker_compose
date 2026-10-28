@@ -15,6 +15,11 @@ services:
       - MYSQL_PASSWORD=1234
     networks:
       - db-data-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p1234"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
   pythonapp:
     build:
       context: .
@@ -31,8 +36,8 @@ services:
     networks:
       - db-data-net
     depends_on:
-      - my_sql
-    restart: unless-stopped
+      my_sql:
+        condition: service_healthy
 
 networks:
   db-data-net:
